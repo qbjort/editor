@@ -15,6 +15,13 @@
   (package-install 'use-package));; automatically install usepackage
 
 ;; Customization startup
+(setq inhibit-splash-screen t)
 (setq inhibit-startup-message t) ;; hide the startup message (usually annoying)
+
+;; Backups (and recovery) 
+(setq backup-inhibited t ;; inhibits backups
+      make-backup-files nil ;; prevent backup files 
+      auto-save-list-file-prefix nil ;; prents auto-save-history directory
+      auto-save-default nil)
 
 ;; Window
