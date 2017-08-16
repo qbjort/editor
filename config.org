@@ -151,7 +151,7 @@ Hydra give the beautiful persistant
 (req-package hydra
  :require hydra)
 #+END_SRC
-**** Simple navigation 
+**** simple emacs navigation 
 #+BEGIN_SRC emacs-lisp
 (defhydra simple-navigate (:color red)
   "
@@ -201,7 +201,7 @@ it has no bind because its a rare but novel function
   ("0" (text-scale-adjust 0) "reset")
   ("q" nil "quit" :color blue))
 #+END_SRC
-**** adavanced nagivation 
+**** adavanced "jump" nagivation 
 #+BEGIN_SRC emacs-lisp
 (defhydra advanced-navigate (:color blue :hint nil)
   "
@@ -242,7 +242,7 @@ _l_: char in line   _s_: subword by char  _f_: search forward    _g_: goto-line
 #+BEGIN_SRC emacs-lisp
 
 #+END_SRC
-**** basic pseudo Vi navigation
+**** pseudo Vi navigation
 Vim is incredibly functional but unfortunately limited (this hydra is acceptable marridge)
 #+BEGIN_SRC emacs-lisp
 (defhydra vi-navigate (:color red :hint nil)
@@ -319,7 +319,7 @@ by windows/frames
             ("u" winner-undo :color red)
             ("v" split-window-horizontally :color red)
             ("w" other-window)
-("z" delete-other-windows)))
+("z" delete-other-windows))
 #+END_SRC 
 *** Keychords							   :keyboard:
 Key chords provides multi-key chorded binding which trigger functions 
