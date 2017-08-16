@@ -1,0 +1,363 @@
+* Require Package 
+Require package is a wrapper/macro for use-package incorporating dependacy management
+#+BEGIN_SRC emacs-lisp
+(use-package req-package
+ :ensure t)
+#+END_SRC
+* Visual 							  :aesthetic:
+** Themes
+*** Ample							      :theme:
+#+BEGIN_SRC emacs-lisp
+(use-package ample-theme
+ :ensure t
+ :config (ample-theme))
+#+END_SRC
+*** Smart mode line
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/theme 'dark)
+  (setq sml/no-confirm-load-theme t)
+  (sml/setup))
+#+END_SRC
+** Color
+*** Rainbow 
+**** delimiters
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+  :defer t)
+#+END_SRC
+**** indentifiers
+colors identifers (variable names) based on the hash of its name
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-identifiers
+ :defer t)
+#+END_SRC
+**** block
+colours different block of code
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-blocks
+ :defer t)
+#+END_SRC
+*** Highlights
+**** higher
+**** numbers
+emphasises numbers in a buffer
+#+BEGIN_SRC emacs-lisp
+(use-package highlight-numbers
+ :defer t)
+#+END_SRC
+* Edit 							       :manipulation:
+** Navitage
+*** Jump to available text 					 :navigation:
+jumps to visible text using a char-based decision tree
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+ :ensure t)
+#+END_SRC
+** Selction
+*** Make multiple cursors 
+clones the mark for synchonized multi- mark editing
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+:ensure t)
+#+END_SRC
+*** Expand selection region
+incrementally expands the scope of selection
+#+BEGIN_SRC emacs-lisp
+(use-package expand-region
+ :ensure t)
+#+END_SRC
+*** Secondary select
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+** Completion 							 :completion:
+*** Snippets							 :completion:
+**** yet another
+pre-defined code template
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+ :defer t
+ :if (not noninteractive)
+ :diminish yas-minor-mode
+ :commands (yas-global-mode yas-minor-mode)
+ :config (setq yas-snippet-dirs (concat user-emacs-directory "yasnippet/")))
+#+END_SRC
+**** abreviations
+short abriaviated
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+* Interface
+** Windows
+*** move between windows :go-between:				     :window:
+simplifies moving the between the window
+#+BEGIN_SRC emacs-lisp
+(use-package windmove
+ :defer t
+ :ensure t)
+#+END_SRC
+*** arrange windows in frame
+windows arrangement in currently selected frame
+#+BEGIN_SRC emacs-lisp
+(use-package transpose-frame
+ :ensure t)
+#+END_SRC
+*** move window borders
+#+BEGIN_SRC emacs-lisp
+(use-package move-border
+ :defer t
+ :ensure t)
+#+END_SRC
+** Buffers
+*** move buffers arround 					     
+moves current buffers between windows
+#+BEGIN_SRC emacs-lisp
+(use-package buffer-move
+ :defer t
+ :ensure t)
+#+END_SRC
+*** make buffer unique
+retitles buffers with distinctive names
+#+BEGIN_SRC emacs-lisp
+(use-package unq
+#+END_SRC
+
+** Prompts
+*** Smart Meta X
+#+BEGIN_SRC emacs-lisp
+(use-package smex
+  :ensure t
+  :config (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex))
+#+END_SRC
+*** Do things interactively
+#+BEGIN_SRC emacs-lisp
+(use-package ido
+ :ensure t
+ :init (ido-mode t)
+ :config
+ (setq ido-enable-flex-matching t
+       ido-everywhere t
+       ido-max-prospects 50
+       ido-max-window-height 0.25))
+#+END_SRC
+
+** Bindings
+*** Hydras							   :keyboard:
+Hydra give the beautiful persistant 
+#+BEGIN_SRC emasc-lisp
+(req-package hydra
+ :require hydra)
+#+END_SRC
+**** Simple navigation 
+#+BEGIN_SRC emacs-lisp
+(defhydra simple-navigate (:color red)
+  "
+_f_: forward-char       _w_: forward-word       _n_: next-line
+_b_: backward-char      _W_: backward-word      _p_: previous-line
+^ ^                     _o_: subword-right      _,_: beginning-of-line
+^ ^                     _O_: subword-left       _._: end-of-line
+
+_s_: forward sentence   _a_: forward paragraph  _g_: forward page
+_S_: backward sentence  _A_: backward paragraph _G_: backward page
+
+_[_: backward-sexp _]_: forward-sexp
+_<_ beginning of buffer _>_ end of buffer _m_: set mark
+"
+  ("f" forward-char)
+  ("b" backward-char)
+  ("w" forward-word)
+  ("W" backward-word)
+  ("n" next-line)
+  ("p" previous-line)
+  ("o" subword-right)
+  ("O" subword-left)
+  ("s" forward-sentence)
+  ("S" backward-sentence)
+  ("a" forward-paragraph)
+  ("A" backward-paragraph)
+  ("g" forward-page)
+  ("G" backward-page)
+  ("<up>" scroll-up)
+  ("<down>" scroll-down)
+  ("<" beginning-of-buffer)
+  (">" end-of-buffer)
+  ("." end-of-line)
+  ("[" backward-sexp)
+  ("]" forward-sexp)
+  ("," beginning-of-line)
+  ("m" set-mark-command)
+  ("q" nil "quit" :color blue)) 
+#+END_SRC
+**** text resize
+it has no bind because its a rare but novel function
+#+BEGIN_SRC emacs-lisp
+(defhydra text-resize ()
+  "zoom"
+  ("+" text-scale-increase "in")
+  ("-" text-scale-decrease "out")
+  ("0" (text-scale-adjust 0) "reset")
+  ("q" nil "quit" :color blue))
+#+END_SRC
+**** adavanced nagivation 
+#+BEGIN_SRC emacs-lisp
+(defhydra advanced-navigate (:color blue :hint nil)
+  "
+Navigate
+^Char^              ^Word^                ^search^                ^Line^
+^^^^^^^^---------------------------------------------------------------------------
+_c_: 2 chars        _w_: word by char                           
+_C_: char           _W_: some word                                
+_l_: char in line   _s_: subword by char  _f_: search forward    _g_: goto-line
+^  ^                _S_: some subword     _b_: search backward   _g_: avy-goto-line
+"
+  ("c" avy-goto-char-2)
+  ("C" avy-goto-char)
+  ("l" avy-goto-char-in-line)
+  ("w" avy-goto-word-1)
+  ;; jump to beginning of some word
+  ("W" avy-goto-word-0)
+  ;; jump to subword starting with a char
+  ("s" avy-goto-subword-1)
+  ;; jump to some subword
+  ("S" avy-goto-subword-0)
+  ("f" isearch-forward)
+  ("b" isearch-backward)
+  ("g" goto-line/body))
+#+END_SRC
+***** goto
+#+BEGIN_SRC emac-lisp
+(defhydra goto-line (goto-map ""
+                                    :pre (linum-mode 1)
+                                    :post (linum-mode -1))
+  "goto-line"
+ ("g" goto-line "go-num")
+ ("l" (progn (linum-mode -1) (avy-goto-line)) "go-char")
+ ("m" set-mark-command "mark" :bind nil)
+ ("q" nil "quit" :color red))
+#+END_SRC
+***** search
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+**** basic pseudo Vi navigation
+Vim is incredibly functional but unfortunately limited (this hydra is acceptable marridge)
+#+BEGIN_SRC emacs-lisp
+(defhydra vi-navigate (:color red :hint nil)
+"
+ VI-style Shortcuts         
+  [_e_] edit _i_ → word _o_ ← word [_a_] avy
+  _j_ ↓ line _k_ ← char _l_ → char _;_ ↑ line
+  _s_: select _d_:destroy _r_:replicate _u_: undo _f_:fix _w_: save
+"
+  ("l" forward-char)
+  ("k" backward-char)
+  ("i" forward-word)
+  ("o" backward-word)
+  ("j" next-line)
+  (";" previous-line)
+  ("s" set-mark-command)
+  ("d" kill-region)
+  ("e" nill :color green)
+  ("u" undo)
+  ("f" yank)
+  ("r" Kill-ring-save)
+  ("a" nil)
+  ("w" save-buffer))
+#+END_SRC
+***** vi-edit
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+**** toggle 
+some feature are unncessary but are useful incertain instances
+#+BEGIN_SRC emacs-lisp
+(defhydra toggle-state (:blue)
+ "
+_l_: line-numbers 
+_t_: transient-mark-mode
+_w_: whitespace-mode
+"
+("w" whitespace-mode)
+("l" linum-mode)
+("t" transient-mark-mode))
+#+END_SRC
+**** window
+by windows/frames 
+#+BEGIN_SRC emacs-lisp
+(defhydra manage-window (:color red :hint nil)
+            "
+                                                                       ╭─────────┐
+     Move to      Size    Scroll        Split                    Do    │ Windows │
+  ╭────────────────────────────────────────────────────────────────────┴─────────╯
+        ^_k_^           ^_K_^       ^_p_^    ╭─┬─┐^ ^        ╭─┬─┐^ ^         ↺ [_u_] undo layout
+        ^^↑^^           ^^↑^^       ^^↑^^    │ │ │_v_ertical ├─┼─┤_b_alance   ↻ [_r_] restore layout
+    _h_ ←   → _l_   _H_ ←   → _L_   ^^ ^^    ╰─┴─╯^ ^        ╰─┴─╯^ ^         ✗ [_d_] close window
+        ^^↓^^           ^^↓^^       ^^↓^^    ╭───┐^ ^        ╭───┐^ ^         ⇋ [_w_] cycle window
+        ^_j_^           ^_J_^       ^_n_^    ├───┤_s_tack    │   │_z_oom
+        ^^ ^^           ^^ ^^       ^^ ^^    ╰───╯^ ^        ╰───╯^ ^       
+  --------------------------------------------------------------------------------
+            "
+            ("<tab>" hydra-master/body "back")
+            ("<ESC>" nil "quit")
+            ("n" joe-scroll-other-window :color red)
+            ("p" joe-scroll-other-window-down :color red)
+            ("b" balance-windows)
+            ("d" delete-window)
+            ("H" shrink-window-horizontally :color red)
+            ("h" windmove-left :color red)
+            ("J" shrink-window :color red)
+            ("j" windmove-down :color red)
+            ("K" enlarge-window :color red)
+            ("k" windmove-up :color red)
+            ("L" enlarge-window-horizontally :color red)
+            ("l" windmove-right :color red)
+            ("r" winner-redo :color red)
+            ("s" split-window-vertically :color red)
+            ("u" winner-undo :color red)
+            ("v" split-window-horizontally :color red)
+            ("w" other-window)
+("z" delete-other-windows)))
+#+END_SRC 
+*** Keychords							   :keyboard:
+Key chords provides multi-key chorded binding which trigger functions 
+#+BEGIN_SRC emacs-lisp
+(use-package key-chord
+ :ensure t
+ :config (key-chord-mode 1))
+#+END_SRC 
+**** navigate
+***** simple nagivate chord
+#+BEGIN_SRC emacs-lisp
+(key-chord-define-global ";n" 'simple-navigate/body)
+#+END_SRC
+***** advange navigate chord
+#+BEGIN_SRC emacs-lisp
+(key-chord-define-global ";a" 'advanced-navigate/body)
+#+END_SRC
+***** vi navigate
+#+BEGIN_SRC emacs-lisp
+(key-chord-define-global ";v" 'vi-navigate/body)
+#+END_SRC
+**** toggle
+***** toggle
+#+BEGIN_SRC emacs-lisp
+(key-chord-define-global ";t" toggle-state/body)
+#+END_SRC :
+* Raw (lisp) :code:
+** mark (toggle)
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+* Utility
+** time
+#+BEGIN_SRC emacs-lisp
+(use-package time
+  :config
+    (setf display-time-default-load-average nil
+          display-time-use-mail-icon t
+          display-time-24hr-format t)
+(display-time-mode t))
+#+END_SRC
+** 

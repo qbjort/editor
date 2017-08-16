@@ -1,3 +1,4 @@
+
 ;; Startup
 (setq inhibit-splash-screen t ;;prevents the default welcom screen
       inhibit-startup-message t);;hide the startup message (usually annoying)
@@ -18,6 +19,7 @@
 (unless (package-installed-p 'use-package);;check if use package exsists
   (package-install 'use-package));; automatically install usepackage
 (setq use-package-always-ensure t);;
+;;
 
 ;; Backups (and recovery disabled) 
 (setq backup-inhibited t ;;inhibits backups
@@ -36,9 +38,21 @@
 (add-to-list 'default-frame-alist '(height . 40))
 (add-to-list 'default-frame-alist '(width . 90))
 
-;; Server (impoved startup timing)
-(unless (server-running-p) 
-  (server-start));;starts the emacs --daemond
+;;Cursor 
+(progn
+  (setq default-cursor-type 'box)
+  (blink-cursor-mode 0))
+
+;;Scrolling 
+(setq scroll-step           1
+      scroll-conservatively 10000)
+
+;;Insertion (writing over text is anoying af)
+(overwrite-mode 0)
+
+
+;; Server (impoved startup timing) 
+(server-start);;starts the emacs --daemond
 ;Increase the garbage collection threshold (500mb)
 (setq gc-cons-threshold (* 500 1024 1024))
 
@@ -51,6 +65,8 @@
 (set-selection-coding-system 'utf-8)
 (setq locale-coding-system   'utf-8)
 
+
+
 ;; Org-bable setup for mordern ORG config
 (use-package org
   :ensure t ;;make sure its install (usually a default package)
@@ -60,7 +76,7 @@
 	org-edit-src-content-indentation nil)
   ;fix syntax native for native syntax highlighting and tabs
   (setq org-src-fontify-natively t
-	org-src-tab-acts-natively t)
+	org-src-tab-acts-natively t))
   ;; Load config.org -> Emacs configuration (with in a org document)
-  (org-babel-load-file (concat user-emacs-directory "config.org")))
+(org-babel-load-file (concat user-emacs-directory "config.org"))
 
