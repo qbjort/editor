@@ -7,6 +7,7 @@
 (require 'package);; source of plugins in emacs
 (setq package-archives ;;set the source of remote directories
       '(("marmalade" . "http://marmalade-repo.org/packages/")
+	("gnu" . "https://elpa.gnu.org/packages/")
 	("melpa" . "http://melpa.org/packages/"))
       package-user-dir 
       (concat user-emacs-directory ".archives");;sets the local archive path
@@ -18,9 +19,9 @@
 ;; Use-package bootstrap (use-package is macro for configuring other packages)
 (unless (package-installed-p 'use-package);;check if use package exsists
   (package-install 'use-package));; automatically install usepackage
-(setq use-package-always-ensure t);;
-;;
-
+;(setq use-package-always-ensure t);;
+;; Use use-package
+(require 'use-package)
 ;; Backups (and recovery disabled) 
 (setq backup-inhibited t ;;inhibits backups
       make-backup-files nil ;;prevent backup files 
@@ -50,7 +51,6 @@
 ;;Insertion (writing over text is anoying af)
 (overwrite-mode 0)
 
-
 ;; Server (impoved startup timing) 
 (server-start);;starts the emacs --daemond
 ;Increase the garbage collection threshold (500mb)
@@ -65,7 +65,10 @@
 (set-selection-coding-system 'utf-8)
 (setq locale-coding-system   'utf-8)
 
-
+;;debug init file
+;(use-package elisp-bug-hunter
+; :ensure t)
+;M-x bug-hunter-init-file RET e
 
 ;; Org-bable setup for mordern ORG config
 (use-package org
@@ -78,5 +81,8 @@
   (setq org-src-fontify-natively t
 	org-src-tab-acts-natively t))
   ;; Load config.org -> Emacs configuration (with in a org document)
-(org-babel-load-file (concat user-emacs-directory "config.org"))
+(use-package async
+ :ensure t)
+(async-start
+ (org-babel-load-file (concat user-emacs-directory "config.org")))
 
