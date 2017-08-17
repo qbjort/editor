@@ -26,12 +26,14 @@ Require package is a wrapper/macro for use-package incorporating dependacy manag
 **** delimiters
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-delimiters
+  :ensure t
   :defer t)
 #+END_SRC
 **** indentifiers
 colors identifers (variable names) based on the hash of its name
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-identifiers
+ :ensure t
  :defer t)
 #+END_SRC
 **** block
@@ -69,20 +71,18 @@ incrementally expands the scope of selection
 (use-package expand-region
  :ensure t)
 #+END_SRC
-*** Secondary select
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
-** Completion 							 :completion:
+** Complcetion 							 :completion:
 *** Snippets							 :completion:
 **** yet another
 pre-defined code template
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
  :defer t
+ :ensure t
  :if (not noninteractive)
  :diminish yas-minor-mode
  :commands (yas-global-mode yas-minor-mode)
- :config (setq yas-snippet-dirs (concat user-emacs-directory "yasnippet/")))
+ :config (setq yas-snippet-dirs (concat user-emacs-directory "snippets/")))
 #+END_SRC
 **** abreviations
 short abriaviated
@@ -147,13 +147,13 @@ retitles buffers with distinctive names
 ** Bindings
 *** Hydras							   :keyboard:
 Hydra give the beautiful persistant 
-#+BEGIN_SRC emasc-lisp
-(req-package hydra
- :require hydra)
-#+END_SRC
-**** simple emacs navigation 
 #+BEGIN_SRC emacs-lisp
-(defhydra simple-navigate (:color red)
+(use-package hydra
+ :ensure t)
+#+END_SRC
+**** simple emacs navigation
+#+BEGIN_SRC emacs-lisp
+(defhydra simple-navigate (:color red :hint nil)
   "
 _f_: forward-char       _w_: forward-word       _n_: next-line
 _b_: backward-char      _W_: backward-word      _p_: previous-line
@@ -189,7 +189,7 @@ _<_ beginning of buffer _>_ end of buffer _m_: set mark
   ("]" forward-sexp)
   ("," beginning-of-line)
   ("m" set-mark-command)
-  ("q" nil "quit" :color blue)) 
+  ("q" nil "quit" :color blue))
 #+END_SRC
 **** text resize
 it has no bind because its a rare but novel function
@@ -210,8 +210,8 @@ Navigate
 ^^^^^^^^---------------------------------------------------------------------------
 _c_: 2 chars        _w_: word by char                           
 _C_: char           _W_: some word                                
-_l_: char in line   _s_: subword by char  _f_: search forward    _g_: goto-line
-^  ^                _S_: some subword     _b_: search backward   _g_: avy-goto-line
+_l_: char in line   _s_: subword by char  _f_: search    _g_: goto-line
+^  ^                _S_: some subword     
 "
   ("c" avy-goto-char-2)
   ("C" avy-goto-char)
@@ -223,8 +223,7 @@ _l_: char in line   _s_: subword by char  _f_: search forward    _g_: goto-line
   ("s" avy-goto-subword-1)
   ;; jump to some subword
   ("S" avy-goto-subword-0)
-  ("f" isearch-forward)
-  ("b" isearch-backward)
+  ("f" search/body)
   ("g" goto-line/body))
 #+END_SRC
 ***** goto
@@ -234,15 +233,18 @@ _l_: char in line   _s_: subword by char  _f_: search forward    _g_: goto-line
                                     :post (linum-mode -1))
   "goto-line"
  ("g" goto-line "go-num")
- ("l" (progn (linum-mode -1) (avy-goto-line)) "go-char")
+ ("l" (progn (linum-mode -1) (avy-goto-line)(linum-mode 1)) "go-char")
  ("m" set-mark-command "mark" :bind nil)
  ("q" nil "quit" :color red))
 #+END_SRC
-***** search
+***** find
 #+BEGIN_SRC emacs-lisp
-
+(defhydra search (goto-map "")
+ "search"
+ ("f" isearch-forward "forward")
+ ("j" isearch-backward "backward"))
 #+END_SRC
-**** pseudo Vi navigation
+**** simple VI navigation
 Vim is incredibly functional but unfortunately limited (this hydra is acceptable marridge)
 #+BEGIN_SRC emacs-lisp
 (defhydra vi-navigate (:color red :hint nil)
@@ -271,7 +273,7 @@ Vim is incredibly functional but unfortunately limited (this hydra is acceptable
 #+BEGIN_SRC emacs-lisp
 
 #+END_SRC
-**** toggle 
+**** toggle
 some feature are unncessary but are useful incertain instances
 #+BEGIN_SRC emacs-lisp
 (defhydra toggle-state (:blue)
@@ -287,40 +289,9 @@ _w_: whitespace-mode
 **** window
 by windows/frames 
 #+BEGIN_SRC emacs-lisp
-(defhydra manage-window (:color red :hint nil)
-            "
-                                                                       ╭─────────┐
-     Move to      Size    Scroll        Split                    Do    │ Windows │
-  ╭────────────────────────────────────────────────────────────────────┴─────────╯
-        ^_k_^           ^_K_^       ^_p_^    ╭─┬─┐^ ^        ╭─┬─┐^ ^         ↺ [_u_] undo layout
-        ^^↑^^           ^^↑^^       ^^↑^^    │ │ │_v_ertical ├─┼─┤_b_alance   ↻ [_r_] restore layout
-    _h_ ←   → _l_   _H_ ←   → _L_   ^^ ^^    ╰─┴─╯^ ^        ╰─┴─╯^ ^         ✗ [_d_] close window
-        ^^↓^^           ^^↓^^       ^^↓^^    ╭───┐^ ^        ╭───┐^ ^         ⇋ [_w_] cycle window
-        ^_j_^           ^_J_^       ^_n_^    ├───┤_s_tack    │   │_z_oom
-        ^^ ^^           ^^ ^^       ^^ ^^    ╰───╯^ ^        ╰───╯^ ^       
-  --------------------------------------------------------------------------------
-            "
-            ("<tab>" hydra-master/body "back")
-            ("<ESC>" nil "quit")
-            ("n" joe-scroll-other-window :color red)
-            ("p" joe-scroll-other-window-down :color red)
-            ("b" balance-windows)
-            ("d" delete-window)
-            ("H" shrink-window-horizontally :color red)
-            ("h" windmove-left :color red)
-            ("J" shrink-window :color red)
-            ("j" windmove-down :color red)
-            ("K" enlarge-window :color red)
-            ("k" windmove-up :color red)
-            ("L" enlarge-window-horizontally :color red)
-            ("l" windmove-right :color red)
-            ("r" winner-redo :color red)
-            ("s" split-window-vertically :color red)
-            ("u" winner-undo :color red)
-            ("v" split-window-horizontally :color red)
-            ("w" other-window)
-("z" delete-other-windows))
 #+END_SRC 
+***** rezise window
+***** window
 *** Keychords							   :keyboard:
 Key chords provides multi-key chorded binding which trigger functions 
 #+BEGIN_SRC emacs-lisp
@@ -346,10 +317,6 @@ Key chords provides multi-key chorded binding which trigger functions
 #+BEGIN_SRC emacs-lisp
 (key-chord-define-global ";t" toggle-state/body)
 #+END_SRC :
-* Raw (lisp) :code:
-** mark (toggle)
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
 * Utility
 ** time
 #+BEGIN_SRC emacs-lisp
@@ -360,4 +327,3 @@ Key chords provides multi-key chorded binding which trigger functions
           display-time-24hr-format t)
 (display-time-mode t))
 #+END_SRC
-** 
